@@ -567,7 +567,7 @@ qualification.
 
 ## Testing
 
-Fifty four test groups cover the rules, discovery, validation, the preview the panel shows,
+Fifty six test groups cover the rules, discovery, validation, the preview the panel shows,
 execution reporting, presets, conventions, auditing, organizing and actor renaming. They create no assets, so
 they run anywhere:
 
@@ -632,16 +632,20 @@ first, or the prebuilt binaries load instead of your edits.
 
 ## Compatibility
 
-| Engine | Status |
-| --- | --- |
-| 5.8 | Developed against, 54 of 54 tests pass |
-| 5.7 | 54 of 54 tests pass |
-| 5.6 | 54 of 54 tests pass |
-| 5.5 | 54 of 54 tests pass |
-| 5.4 | 54 of 54 tests pass |
+| Engine | On Fab | Tests |
+| --- | --- | --- |
+| 5.8 | Yes — developed against | 56 of 56 pass |
+| 5.7 | Yes | 56 of 56 pass |
+| 5.6 | Yes | 56 of 56 pass |
+| 5.5 | No | 56 of 56 pass |
+| 5.4 | No | 56 of 56 pass |
 
-Sold on Fab for 5.6, 5.7 and 5.8 — the three versions Epic builds against. The suite is run on
-5.4 and 5.5 as well, so the table reports more than the store offers.
+Epic builds a submitted plugin against the three latest engine versions by default, which is why
+the store offers 5.6 and up.
+
+5.4 and 5.5 are not for sale and are not abandoned either. The suite runs on them on every pass,
+and the plugin builds and works there from source. If you are on one of them and want it, ask —
+older versions can be added to a listing by request.
 
 The source contains no engine version guards. Two scripts rebuild this table, and they check
 deliberately opposite things:

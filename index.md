@@ -443,9 +443,23 @@ opens a transaction, and the operation writes to disk before it returns. Nameste
 records every run to the project's `Saved` folder as a CSV, automatically, whether it came
 from the panel or the commandlet.
 
-That record is an audit trail, not an undo system. It says what was renamed to what, so a run
-can be reviewed, diffed against its own dry run, or reversed by hand or by a second run. It
-does not restore anything on its own, and no button here claims to.
+That record is an audit trail, and it is also the way back. **History**, then a run, then **Load
+This Run in Reverse**: the report is read, every rename it made is pointed the other way, and the
+result arrives as an ordinary preview. The same validation, the same collision check, the same
+referencing count, the same button. Nothing is renamed until you press it.
+
+It is still not an undo, and the difference is worth understanding rather than glossing. It
+resolves every asset against the project as it stands now, not as the report remembers it, so
+anything renamed again, moved or deleted since that run is simply not there and is left out —
+the panel says how many. A name that something else has taken in the meantime is refused in its
+own row, like any other collision. What comes back is what can come back, and you see exactly
+that before anything runs.
+
+It works after the editor has been closed and reopened, which is the part Ctrl+Z cannot do.
+
+Reversals are walked back to front. Within one batch a later rename may have freed the name an
+earlier one wanted, so undoing in the order it happened would walk into that collision instead of
+out of it.
 
 Renaming actors is the exception, and the reason the two are separate: a label change goes
 through `Modify`, so it undoes properly and needs no record.

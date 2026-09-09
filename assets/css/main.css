@@ -55,9 +55,13 @@ body {
 
 /* ── Drafting grid.
    A texture rather than a picture. It reads as a technical surface — a viewport, a plan — which
-   is what this tool lives in, and it costs a gradient rather than a download. Fixed, so it does
-   not slide around under the content, and faint enough that it never competes with a word: the
-   reading panel is opaque, so none of it reaches the text. ── */
+   is what this tool lives in, and it costs two gradients rather than a download.
+
+   Fixed, so the page floats over a still surface instead of dragging a pattern along with it,
+   and even rather than faded: a fixed layer is masked against the viewport, not the document,
+   so any vertical fade would look identical at every scroll position — motion that never
+   happens. It is faint enough not to need one. The reading panel is opaque, so none of this
+   reaches a word of the manual. ── */
 
 body::before {
   content: "";
@@ -65,68 +69,10 @@ body::before {
   inset: 0;
   z-index: -2;
   background-image:
-    linear-gradient(rgba(29,29,31,0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(29,29,31,0.045) 1px, transparent 1px);
+    linear-gradient(rgba(29,29,31,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29,29,31,0.04) 1px, transparent 1px);
   background-size: 64px 64px;
-  /* Fade the grid out down the page so it frames the hero and lets the manual sit quiet. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.35) 55%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.35) 55%, transparent 100%);
   pointer-events: none;
-}
-
-/* ── Atmosphere.
-   Frosted glass has nothing to do on a flat ground: blur an even colour and you get the same
-   even colour back, which is why the nav read as plain grey. These give it something to
-   refract. They sit high on the page on purpose — the nav and hero get the depth, and the
-   reading column below stays on calm ground where the text has to be legible for 570 lines. ── */
-
-.orbs {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-/* Translucent circles, blurred — not radial gradients. A gradient already fades to nothing at
-   its edge, so blurring one on top of that blurs away the colour and leaves the flat ground you
-   started with. A solid circle has something for the blur to spread. */
-.orbs span {
-  position: absolute;
-  display: block;
-  border-radius: 50%;
-  filter: blur(50px);
-}
-
-.orbs .o1 {
-  width: 520px; height: 520px;
-  top: -150px; left: -90px;
-  background: rgba(10,132,255,0.58);
-}
-
-.orbs .o2 {
-  width: 460px; height: 460px;
-  top: -120px; right: -70px;
-  background: rgba(94,92,230,0.52);
-}
-
-.orbs .o3 {
-  width: 380px; height: 380px;
-  top: 190px; left: 46%;
-  background: rgba(10,132,255,0.30);
-}
-
-/* One low down, so the page does not go flat the moment you scroll past the hero. */
-.orbs .o4 {
-  width: 460px; height: 460px;
-  bottom: -200px; right: -110px;
-  background: rgba(94,92,230,0.30);
-}
-
-@media (max-width: 720px) {
-  .orbs .o1 { width: 300px; height: 300px; }
-  .orbs .o2 { width: 260px; height: 260px; }
-  .orbs .o3, .orbs .o4 { display: none; }
 }
 
 /* ── Sticky nav. The one place glass belongs: it overlaps scrolling content. ── */
@@ -211,8 +157,8 @@ body::before {
   gap: 10px;
 }
 
-/* Glass, legitimately: these float over the orb field, so there is something behind them worth
-   blurring. The reading panel below does not, which is why it stays solid. */
+/* Glass over the grid: the lines soften as they pass under, which is what gives these something
+   to be. The reading panel does not sit on anything worth blurring, which is why it stays solid. */
 .hero .meta span {
   font-size: 12px;
   font-weight: 500;

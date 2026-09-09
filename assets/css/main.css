@@ -47,14 +47,59 @@ body {
   line-height: 1.6;
 }
 
+/* ── Atmosphere.
+   Frosted glass has nothing to do on a flat ground: blur an even colour and you get the same
+   even colour back, which is why the nav read as plain grey. These give it something to
+   refract. They sit high on the page on purpose — the nav and hero get the depth, and the
+   reading column below stays on calm ground where the text has to be legible for 570 lines. ── */
+
+.orbs {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.orbs span {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.5;
+}
+
+.orbs .o1 {
+  width: 620px; height: 620px;
+  top: -260px; left: -160px;
+  background: radial-gradient(circle, rgba(10,132,255,0.42), rgba(10,132,255,0) 70%);
+}
+
+.orbs .o2 {
+  width: 560px; height: 560px;
+  top: -200px; right: -140px;
+  background: radial-gradient(circle, rgba(94,92,230,0.38), rgba(94,92,230,0) 70%);
+}
+
+.orbs .o3 {
+  width: 720px; height: 720px;
+  top: 180px; left: 42%;
+  background: radial-gradient(circle, rgba(10,132,255,0.20), rgba(10,132,255,0) 70%);
+}
+
+@media (max-width: 720px) {
+  .orbs .o1, .orbs .o2 { width: 380px; height: 380px; }
+  .orbs .o3 { display: none; }
+}
+
 /* ── Sticky nav. The one place glass belongs: it overlaps scrolling content. ── */
 
 .nav {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(245,245,247,0.72);
-  backdrop-filter: saturate(180%) blur(20px);
+  background: rgba(245,245,247,0.62);
+  backdrop-filter: saturate(190%) blur(22px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid transparent;
   transition: border-color .3s var(--ease-out-quart), box-shadow .3s var(--ease-out-quart);
@@ -129,12 +174,16 @@ body {
   gap: 10px;
 }
 
+/* Glass, legitimately: these float over the orb field, so there is something behind them worth
+   blurring. The reading panel below does not, which is why it stays solid. */
 .hero .meta span {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-2);
-  background: var(--surface);
-  border: 1px solid var(--hairline);
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border: 1px solid rgba(255,255,255,0.7);
   border-radius: 999px;
   padding: 5px 13px;
   font-variant-numeric: tabular-nums;

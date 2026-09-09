@@ -1,7 +1,3 @@
-# Namestead
-
-**Asset Workflow & Quality Toolkit for Unreal Engine**
-
 Keep a project clean, consistent and manageable as it grows.
 
 Large projects drift. Names stop matching whatever convention they started with, assets end up

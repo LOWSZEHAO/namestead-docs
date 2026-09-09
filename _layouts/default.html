@@ -3,6 +3,100 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Lets the browser paint its own canvas, scrollbars and form controls in the right shade
+     before any CSS arrives. The script below overrides it when a choice has been stored. -->
+<meta name="color-scheme" content="light dark">
+
+<script>
+// Ahead of the stylesheet link on purpose. A classic script that follows a still-pending
+// stylesheet is held until that sheet loads, which on a cold cache leaves the root unstamped
+// for the whole CSS round trip -- exactly the window a wrong-theme flash lives in. Stamped
+// first, the stylesheet resolves once, against the final state.
+//
+// Only an explicit choice is ever stamped. An unstamped root means "follow the OS" and is left
+// to the prefers-color-scheme block, so the site still lands on the right theme with scripting
+// off, and follows a live OS change with no listener.
+//
+// The click is delegated from the document rather than bound to the button, because the button
+// does not exist yet at this point in the parse and the manual is long enough that binding at
+// the end of the body would leave a visible, pressable, dead control in between.
+(function () {
+  var KEY = 'namestead:theme';
+  var root = document.documentElement;
+  var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  root.classList.add('js');
+
+  var stamp = function (theme) {
+    if (theme === 'light' || theme === 'dark') {
+      root.setAttribute('data-theme', theme);
+      root.style.colorScheme = theme;
+    } else {
+      root.removeAttribute('data-theme');
+      root.style.colorScheme = '';
+    }
+  };
+
+  // Blocking site data throws on the localStorage getter itself, not on the method, so the
+  // property access has to be inside the try as well.
+  var stored = function () {
+    try { return localStorage.getItem(KEY); } catch (e) { return null; }
+  };
+
+  stamp(stored());
+
+  // No stored value means the OS decides, so what is on screen has to be resolved rather than
+  // read off the attribute.
+  var rendered = function () {
+    var chosen = root.getAttribute('data-theme');
+    return (chosen === 'light' || chosen === 'dark')
+      ? chosen
+      : (systemDark.matches ? 'dark' : 'light');
+  };
+
+  var relabel = function () {
+    var button = document.getElementById('theme-toggle');
+    if (button) {
+      button.setAttribute('aria-label',
+        rendered() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+  };
+
+  var apply = function (theme) {
+    root.classList.add('theme-switching');
+    stamp(theme);
+    relabel();
+    // One frame for the swap to lay out, one for it to paint, before the page is allowed to
+    // animate anything again.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { root.classList.remove('theme-switching'); });
+    });
+  };
+
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    if (!target || !target.closest || !target.closest('#theme-toggle')) { return; }
+    var next = rendered() === 'dark' ? 'light' : 'dark';
+    apply(next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+
+  // A second tab on the same manual is ordinary for a reference document. Without this it keeps
+  // rendering the old theme against a store that now says otherwise, then appears to change by
+  // itself on its next navigation.
+  window.addEventListener('storage', function (event) {
+    if (event.key === KEY) { apply(event.newValue); }
+  });
+
+  // While no choice is stored the OS can change the theme underneath the button, and a label
+  // still offering the theme already on screen is a lie.
+  systemDark.addEventListener('change', relabel);
+
+  document.addEventListener('DOMContentLoaded', relabel);
+})();
+</script>
+
 <title>{{ site.title }} — {{ site.description }}</title>
 <meta name="description" content="{{ site.description }}">
 <meta property="og:title" content="{{ site.title }}">
@@ -11,6 +105,127 @@
 <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 </head>
 <body>
+
+<svg id="bg-art" viewBox="0 0 2560 1600" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true" focusable="false">
+  <!--
+    Namestead documentation background.
+
+    Inline rather than referenced: an SVG loaded through background-image or an img element is an
+    isolated document that this page's custom properties never reach, so as a file it could only
+    ever be one colour. Every colour below is a token carrying its light value as the fallback,
+    so with no tokens defined at all this renders as the original light artwork.
+
+    The ids are all prefixed bg- because they now share a namespace with the heading anchors
+    kramdown generates from the manual. Never place two copies of this on one page: duplicate
+    ids would make the second copy's gradients resolve against the first copy's context.
+
+    The central 1160px column is deliberately kept quiet for page content.
+  -->
+  <style>
+    /* No angle bracket may appear in this block, not even inside a comment. The content of an
+       inline svg style element is parsed as markup rather than as raw text, so one would open
+       an element and silently swallow the rest of the artwork. */
+    #bg-art .b-base        { fill: var(--bg-base, #f5f5f7); }
+    #bg-art .b-ink-f       { fill: var(--bg-ink, #1d1d1f); }
+    #bg-art .b-ink-s       { stroke: var(--bg-ink, #1d1d1f); }
+    #bg-art .b-card        { fill: var(--bg-card, #ffffff); }
+    #bg-art .b-bloom       { fill: var(--bg-bloom, #ffffff); }
+    #bg-art .b-glow        { fill: var(--bg-accent, #0071e3); }
+    #bg-art .b-node        { stroke: var(--bg-accent, #0071e3); }
+    #bg-art .b-stop-ink    { stop-color: var(--bg-ink, #1d1d1f); }
+    #bg-art .b-stop-accent { stop-color: var(--bg-accent, #0071e3); }
+    #bg-art .b-grid        { opacity: var(--bg-grid-opacity, .42); }
+
+    /* Anchored to the id in both directions: these rules are document-global and must not reach
+       the manual, and a later rule in the manual must not reach the artwork.
+
+       One dimmer for the whole edge motif. Light ink on a dark ground reads stronger than dark
+       ink on a light one at the same alpha, and a group opacity turns the drawing down as a unit
+       without editing the twenty authored stroke-opacities that give the lines their depth. At
+       the default 1 it is an identity operation, so the light artwork is untouched. */
+    #bg-art .b-edge        { stroke: var(--bg-ink, #1d1d1f); opacity: var(--bg-ink-strength, 1); }
+  </style>
+  <defs>
+    <radialGradient id="bg-blueGlow" cx="0" cy="0" r="1" gradientTransform="translate(208 178) rotate(42.3) scale(844 776)" gradientUnits="userSpaceOnUse">
+      <stop class="b-stop-accent" stop-opacity=".12"/>
+      <stop offset="1" class="b-stop-accent" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bg-blueGlowRight" cx="0" cy="0" r="1" gradientTransform="translate(2384 1398) rotate(-137.7) scale(844 776)" gradientUnits="userSpaceOnUse">
+      <stop class="b-stop-accent" stop-opacity=".10"/>
+      <stop offset="1" class="b-stop-accent" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bg-lineFade" x1="0" y1="0" x2="1" y2="0">
+      <stop class="b-stop-ink" stop-opacity="0"/>
+      <stop offset=".5" class="b-stop-ink" stop-opacity=".075"/>
+      <stop offset="1" class="b-stop-ink" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="bg-blur64" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="64"/>
+    </filter>
+    <filter id="bg-blur30" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="30"/>
+    </filter>
+    <pattern id="bg-dotGrid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" class="b-ink-f" fill-opacity=".045"/>
+    </pattern>
+    <clipPath id="bg-leftEdge"><rect width="660" height="1600"/></clipPath>
+    <clipPath id="bg-rightEdge"><rect x="1900" width="660" height="1600"/></clipPath>
+  </defs>
+
+  <!-- Base: cool paper ground. -->
+  <rect width="2560" height="1600" class="b-base"/>
+  <rect width="2560" height="1600" fill="url(#bg-blueGlow)"/>
+  <rect width="2560" height="1600" fill="url(#bg-blueGlowRight)"/>
+
+  <!-- Quiet texture — the one part of the artwork a phone still sees once cover has cropped the
+       edges away, which is why dark quietens it far less than it quietens the linework. -->
+  <rect width="2560" height="1600" fill="url(#bg-dotGrid)" class="b-grid"/>
+
+  <!-- Left: abstract asset hierarchy / workflow paths. -->
+  <g clip-path="url(#bg-leftEdge)" class="b-edge" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-20 318C103 318 104 478 226 478H481" stroke-opacity=".075" stroke-width="1.5"/>
+    <path d="M-34 682H172C265 682 264 558 358 558H622" stroke-opacity=".065" stroke-width="1.5"/>
+    <path d="M-44 1120C113 1120 105 980 262 980H616" stroke-opacity=".06" stroke-width="1.5"/>
+    <path d="M109 143C109 214 175 258 255 258H585" stroke-opacity=".05" stroke-width="1.5"/>
+    <circle cx="226" cy="478" r="7" class="b-base b-node" stroke-opacity=".22" stroke-width="1.5"/>
+    <circle cx="358" cy="558" r="6" class="b-base b-ink-s" stroke-opacity=".14" stroke-width="1.5"/>
+    <circle cx="262" cy="980" r="7" class="b-base b-node" stroke-opacity=".18" stroke-width="1.5"/>
+    <rect x="477" y="447" width="106" height="62" rx="12" class="b-card b-ink-s" fill-opacity=".68" stroke-opacity=".07"/>
+    <rect x="495" y="467" width="40" height="5" rx="2.5" class="b-ink-f" fill-opacity=".11" stroke="none"/>
+    <rect x="495" y="483" width="67" height="4" rx="2" class="b-ink-f" fill-opacity=".06" stroke="none"/>
+    <rect x="474" y="949" width="118" height="62" rx="12" class="b-card b-ink-s" fill-opacity=".56" stroke-opacity=".06"/>
+    <rect x="492" y="969" width="52" height="5" rx="2.5" class="b-ink-f" fill-opacity=".10" stroke="none"/>
+    <rect x="492" y="985" width="78" height="4" rx="2" class="b-ink-f" fill-opacity=".06" stroke="none"/>
+  </g>
+
+  <!-- Right: sparse file/folder forms, pushed out of the reading column. -->
+  <g clip-path="url(#bg-rightEdge)" class="b-edge" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1932 365H2134C2213 365 2204 491 2285 491H2600" stroke-opacity=".065" stroke-width="1.5"/>
+    <path d="M1950 820H2176C2260 820 2253 696 2336 696H2605" stroke-opacity=".075" stroke-width="1.5"/>
+    <path d="M1954 1288H2131C2224 1288 2219 1405 2317 1405H2602" stroke-opacity=".055" stroke-width="1.5"/>
+    <path d="M1922 134C2075 134 2060 246 2206 246H2592" stroke-opacity=".045" stroke-width="1.5"/>
+    <circle cx="2285" cy="491" r="7" class="b-base b-node" stroke-opacity=".18" stroke-width="1.5"/>
+    <circle cx="2336" cy="696" r="6" class="b-base b-ink-s" stroke-opacity=".14" stroke-width="1.5"/>
+    <circle cx="2317" cy="1405" r="7" class="b-base b-node" stroke-opacity=".16" stroke-width="1.5"/>
+    <rect x="1969" y="789" width="122" height="62" rx="12" class="b-card b-ink-s" fill-opacity=".68" stroke-opacity=".07"/>
+    <rect x="1987" y="809" width="45" height="5" rx="2.5" class="b-ink-f" fill-opacity=".11" stroke="none"/>
+    <rect x="1987" y="825" width="80" height="4" rx="2" class="b-ink-f" fill-opacity=".06" stroke="none"/>
+    <rect x="1988" y="1257" width="118" height="62" rx="12" class="b-card b-ink-s" fill-opacity=".56" stroke-opacity=".06"/>
+    <rect x="2006" y="1277" width="48" height="5" rx="2.5" class="b-ink-f" fill-opacity=".10" stroke="none"/>
+    <rect x="2006" y="1293" width="75" height="4" rx="2" class="b-ink-f" fill-opacity=".06" stroke="none"/>
+  </g>
+
+  <!-- Edge-focused glows provide depth without obscuring type. The centre lift stays faint: at
+       cover on a wide display the middle of the artwork lands beside the hero, where anything
+       stronger reads as a wash rather than as depth. -->
+  <circle cx="106" cy="178" r="150" class="b-glow" fill-opacity=".06" filter="url(#bg-blur64)"/>
+  <circle cx="2426" cy="1410" r="164" class="b-glow" fill-opacity=".05" filter="url(#bg-blur64)"/>
+  <ellipse cx="1280" cy="792" rx="430" ry="258" class="b-bloom" fill-opacity=".12" filter="url(#bg-blur30)"/>
+
+  <!-- Gentle horizontal structure, almost imperceptible behind a long document. -->
+  <rect x="616" y="184" width="1328" height="1" fill="url(#bg-lineFade)"/>
+  <rect x="616" y="1415" width="1328" height="1" fill="url(#bg-lineFade)"/>
+</svg>
 
 <nav class="nav" id="nav">
   <div class="nav-inner">
@@ -22,6 +237,16 @@
       <a href="#installation">Install</a>
       <a href="#support">Support</a>
     </div>
+    <button class="nav-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <g class="moon"><path d="M20.8 13.1A8.6 8.6 0 1 1 11.2 3.4a7.2 7.2 0 0 0 9.6 9.7z"/></g>
+        <g class="sun">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2.4v2.1M12 19.5v2.1M4.2 12H2.1M21.9 12h-2.1M6.2 6.2 4.7 4.7M19.3 19.3l-1.5-1.5M17.8 6.2l1.5-1.5M4.7 19.3l1.5-1.5"/>
+        </g>
+      </svg>
+    </button>
   </div>
 </nav>
 

@@ -1,6 +1,12 @@
-/* Namestead documentation — built on the Apple Liquid Glass token system. */
+/* Namestead documentation — built on the Apple Liquid Glass token system.
+
+   Every colour on the page comes from this block. Nothing below it may write a colour literal:
+   a literal cannot follow a theme, and one missed literal is a surface that stays light while
+   the rest of the page goes dark. */
 
 :root {
+  color-scheme: light;
+
   --bg:        #f5f5f7;
   --surface:   #ffffff;
   --hover:     #fbfbfd;
@@ -14,6 +20,36 @@
 
   --accent:      #0071e3;
   --accent-link: #0066cc;
+
+  /* The nav's glass and the hero chips were literals until the theme needed them. */
+  --glass-nav: rgba(245,245,247,0.72);
+  --sh-nav:    0 1px 12px rgba(0,0,0,0.04);
+  --chip-bg:   rgba(255,255,255,0.38);
+
+  /* Separate from --hairline even though the two match here. The screenshots are dark editor
+     UI: against a white panel they separate themselves and this border only softens the corner,
+     but on a dark panel it is the only thing stopping them reading as holes punched in the
+     page, so dark needs a stronger value than a hairline. */
+  --img-border: rgba(0,0,0,0.07);
+
+  /* The toggle shows the theme it would switch to, so the icon rides the palette instead of a
+     second set of selectors that could fall out of step with it. */
+  --icon-sun:  none;
+  --icon-moon: block;
+
+  /* Ground. Kept apart from the page palette so the artwork can be tuned without touching type
+     colours. Each has its original light value as a fallback inside the markup, so deleting
+     the lot renders the artwork exactly as it was drawn.
+
+     --bg-base tracks --bg rather than repeating it: if the two drift, an overscroll bounce
+     shows a seam past the edge of the fixed artwork. */
+  --bg-base:         var(--bg);
+  --bg-ink:          #1d1d1f;
+  --bg-ink-strength: 1;
+  --bg-card:         #ffffff;
+  --bg-bloom:        #ffffff;
+  --bg-accent:       var(--accent);
+  --bg-grid-opacity: .42;
 
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
           'Helvetica Neue', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
@@ -33,6 +69,127 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+/* ── Dark.
+   Written twice on purpose, and the two lists must be kept identical. CSS has no way to define
+   a set of custom properties once and apply it from two selectors, and light-dark() would put
+   the whole palette behind a 2024 browser floor for a manual someone may open on whatever is
+   installed at work.
+
+   The :not() is what makes an explicit choice mean something: without it a dark OS would
+   overrule a reader who asked for light, and the button would look broken. The two blocks DO
+   both match a reader on a dark OS who has chosen dark — "dark" is not "light", so the guard
+   passes — and they carry the same specificity, so the attribute block is written second and
+   wins on order. That is also why drift between them is dangerous rather than merely untidy:
+   a value edited in only the media block is silently overridden the moment the reader touches
+   the button. ── */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg:        #131316;
+    --surface:   #1e1e21;
+    --hover:     #191a1d;
+    --text:      #f0f0f3;
+    --text-body: #c9c9d0;
+    --text-2:    #9b9ba3;
+    --text-3:    #8a8a92;
+    --faint:     #45454e;
+    --hairline:  rgba(255,255,255,0.10);
+    --track:     #2c2c31;
+
+    --accent:      #0a84ff;
+    --accent-link: #409cff;
+
+    --glass-nav: rgba(19,19,22,0.72);
+    --sh-nav:    0 1px 14px rgba(0,0,0,0.55);
+    --chip-bg:   rgba(255,255,255,0.06);
+
+    --img-border: rgba(255,255,255,0.16);
+
+    --icon-sun:  block;
+    --icon-moon: none;
+
+    --bg-ink:          #c8c8d0;
+    --bg-ink-strength: .85;
+    --bg-card:         #1a1a20;
+    --bg-bloom:        #1b1b24;
+    --bg-grid-opacity: .75;
+
+    --sh-card:  0 0 0 1px rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.45);
+    --sh-panel: 0 0 0 1px rgba(255,255,255,0.06), 0 1px 3px rgba(0,0,0,0.55), 0 18px 48px rgba(0,0,0,0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg:        #131316;
+  --surface:   #1e1e21;
+  --hover:     #191a1d;
+  --text:      #f0f0f3;
+  --text-body: #c9c9d0;
+  --text-2:    #9b9ba3;
+  --text-3:    #8a8a92;
+  --faint:     #45454e;
+  --hairline:  rgba(255,255,255,0.10);
+  --track:     #2c2c31;
+
+  --accent:      #0a84ff;
+  --accent-link: #409cff;
+
+  --glass-nav: rgba(19,19,22,0.72);
+  --sh-nav:    0 1px 14px rgba(0,0,0,0.55);
+  --chip-bg:   rgba(255,255,255,0.06);
+
+  --img-border: rgba(255,255,255,0.16);
+
+  --icon-sun:  block;
+  --icon-moon: none;
+
+  --bg-ink:          #c8c8d0;
+  --bg-ink-strength: .85;
+  --bg-card:         #1a1a20;
+  --bg-bloom:        #1b1b24;
+  --bg-grid-opacity: .75;
+
+  --sh-card:  0 0 0 1px rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.45);
+  --sh-panel: 0 0 0 1px rgba(255,255,255,0.06), 0 1px 3px rgba(0,0,0,0.55), 0 18px 48px rgba(0,0,0,0.5);
+}
+
+/* Nothing else on the page transitions colour, but .nav animates border-color and box-shadow
+   over 300ms and both of those read tokens that move — so without this the rule under the bar
+   arrives a third of a second after the rest of the page has already changed. */
+:root.theme-switching,
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+  transition: none !important;
+}
+
+/* Printing is always light. Backgrounds are not printed by default, so a dark theme would put
+   near-white type on white paper — and the manual holds commandlet invocations someone may
+   well want beside a machine. */
+@media print {
+  :root,
+  :root[data-theme="dark"] {
+    color-scheme: light;
+
+    --bg:        #f5f5f7;
+    --surface:   #ffffff;
+    --text:      #1d1d1f;
+    --text-body: #424245;
+    --text-2:    #6e6e73;
+    --text-3:    #86868b;
+    --faint:     #d2d2d7;
+    --hairline:  rgba(0,0,0,0.07);
+    --accent-link: #0066cc;
+    --img-border:  rgba(0,0,0,0.07);
+  }
+
+  .nav, #bg-art { display: none; }
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
@@ -41,8 +198,9 @@ html {
   scroll-padding-top: 76px;
 }
 
-/* Transparent on purpose. A negative z-index pseudo-element paints behind its own element's
-   background, so an opaque body would hide the grid below entirely. */
+/* Transparent on purpose. A negative z-index element paints behind its parent's background, so
+   giving body a colour — the obvious reach when adding a dark theme — hides the ground
+   completely. */
 body {
   background: transparent;
   color: var(--text);
@@ -54,24 +212,25 @@ body {
 }
 
 /* ── The ground.
-   An SVG rather than the CSS grid it replaces: same cool paper, same dot texture, but with the
-   asset-hierarchy motif running down both edges, which says what this tool is about without a
-   word. It carries its own #f5f5f7 base, so it meets the html background with no seam.
+   The asset-hierarchy motif down both edges, which says what this tool is about without a word.
 
-   Fixed and covering, so the page floats over a still surface. `cover` crops the edges first on
-   a narrow viewport, which is the right thing to lose — the middle of the image is deliberately
-   quiet, so a phone gets close to plain paper and the manual stays readable. 6 KB, and it scales
-   to any display without a second asset. ── */
+   Inline in the layout rather than a background-image, because an SVG loaded as an image is an
+   isolated document that this page's custom properties never reach — as a file it could only
+   ever be one colour. Inline it belongs to this cascade, so it repaints with the token swap in
+   the same style recalculation as the type: no second file to keep in step, and no fetch on the
+   first switch to flash a light slab behind a dark page.
 
-body::before {
-  content: "";
+   preserveAspectRatio="xMidYMid slice" on the element is background-size: cover with
+   background-position: center. `cover` crops the edges first on a narrow viewport, which is the
+   right thing to lose — the middle of the artwork is deliberately quiet, so a phone gets close
+   to plain ground and the manual stays readable. ── */
+
+#bg-art {
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: -2;
-  background-image: url("../img/background.svg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   pointer-events: none;
 }
 
@@ -81,7 +240,7 @@ body::before {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(245,245,247,0.72);
+  background: var(--glass-nav);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid transparent;
@@ -91,7 +250,7 @@ body::before {
 /* No permanent rule under the chrome — it earns one once content passes beneath. */
 .nav.scrolled {
   border-bottom-color: var(--hairline);
-  box-shadow: 0 1px 12px rgba(0,0,0,0.04);
+  box-shadow: var(--sh-nav);
 }
 
 .nav-inner {
@@ -124,6 +283,50 @@ body::before {
 .nav-links a:hover { color: var(--text); }
 
 @media (max-width: 640px) { .nav-links { display: none; } }
+
+/* ── Theme toggle.
+   A sibling of .nav-links, never a child of it: the rule above hides that div on every phone
+   and would take the control with it. ── */
+
+/* A button, not a link. An anchor would send scroll-behavior: smooth back to the top of the
+   manual on every press and leave a hash behind in the history. */
+.nav-toggle {
+  display: none;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: color .2s var(--ease-out-quart), background .2s var(--ease-out-quart);
+}
+
+/* With scripting off the control could do nothing, and that reader already has the theme their
+   OS asked for through the media query. */
+:root.js .nav-toggle { display: flex; }
+
+.nav-toggle:hover { color: var(--text); background: var(--track); }
+
+/* The page has no focus styles of its own, and the browser ring is the wrong shape on glass. */
+.nav-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.nav-toggle svg { display: block; width: 17px; height: 17px; }
+
+/* The icon shows the theme the button would switch TO, driven by the same token block as the
+   palette so the two cannot fall out of step. */
+.nav-toggle .sun  { display: var(--icon-sun); }
+.nav-toggle .moon { display: var(--icon-moon); }
+
+/* .nav-links carries the margin-left:auto that pushes the right-hand group over, and it is
+   display:none here — without this the button collapses back against the wordmark. Giving both
+   elements margin-left:auto is wrong: flexbox would split the free space and move the links. */
+@media (max-width: 640px) { .nav-toggle { margin-left: auto; } }
 
 /* ── Hero ── */
 
@@ -168,7 +371,7 @@ body::before {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-2);
-  background: rgba(255,255,255,0.38);
+  background: var(--chip-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--hairline);
@@ -367,7 +570,7 @@ body::before {
   width: 100%;
   height: auto;
   margin-top: 26px;
-  border: 1px solid var(--hairline);
+  border: 1px solid var(--img-border);
   border-radius: var(--r-thumb);
 }
 

@@ -73,10 +73,12 @@
     <rect x="2006" y="1293" width="75" height="4" rx="2" fill="#1D1D1F" fill-opacity=".06" stroke="none"/>
   </g>
 
-  <!-- Edge-focused glows provide depth without obscuring type. -->
+  <!-- Edge-focused glows provide depth without obscuring type. The centre lift stays faint: at
+       background-size cover on a wide display the middle of the artwork lands beside the hero,
+       where anything stronger reads as a white wash rather than as depth. -->
   <circle cx="106" cy="178" r="150" fill="#0071E3" fill-opacity=".06" filter="url(#blur64)"/>
   <circle cx="2426" cy="1410" r="164" fill="#0071E3" fill-opacity=".05" filter="url(#blur64)"/>
-  <ellipse cx="1280" cy="792" rx="430" ry="258" fill="#FFF" fill-opacity=".34" filter="url(#blur30)"/>
+  <ellipse cx="1280" cy="792" rx="430" ry="258" fill="#FFF" fill-opacity=".12" filter="url(#blur30)"/>
 
   <!-- Gentle horizontal structure, almost imperceptible behind a long document. -->
   <rect x="616" y="184" width="1328" height="1" fill="url(#lineFade)"/>

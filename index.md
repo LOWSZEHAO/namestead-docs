@@ -46,7 +46,9 @@ Then, in about two minutes:
    knowing before you press Rename.
 2. **Load a starting point.** **Load Preset > Unreal Standard** gives each asset the prefix for
    its class — `SM_`, `BP_`, `MI_` and so on, eighteen classes in all. Anything else is left
-   alone rather than guessed at, so a batch of levels comes back Unchanged.
+   alone rather than guessed at, so a batch of ordinary assets comes back Unchanged. Maps are a
+   special case: a World Partition level never enters the batch at all, for the reason under
+   [Renaming behavior](#renaming-behavior).
 3. **Read the preview.** Every row shows the current name, the proposed name, and a status. The
    line under the table says how many assets a rename would *also rewrite* — renaming a
    referenced asset repoints the things that point at it, and those were never selected.
@@ -164,8 +166,9 @@ so a pattern of `SM_{NAME}` turns `SM_Door` into `SM_SM_Door`, and the asset is 
 violation forever. Use Name Pattern for renaming, and prefix rules for conventions.
 
 Rules that depend on an asset's position in a batch, such as Sequential Numbering, cannot be
-checked one asset at a time and are left out of validation. The panel and the health report
-both say when that has happened, rather than reporting a partial check as a clean one.
+checked one asset at a time and are left out of validation. The health report says when that has
+happened — the Naming row carries the note, in the panel and in the commandlet — rather than
+reporting a partial check as a clean one.
 
 ## The panel
 
@@ -174,7 +177,7 @@ Four things the panel points at, chosen with the radio buttons at the top left: 
 last two report on the project and act on what they find.
 
 Project Health runs every whole-project report and shows the summary above the findings.
-Nothing there writes. When it finds naming violations, **Review Naming Fixes** loads them as an
+Nothing there writes. When it finds naming violations, **Review N Naming Fix(es)** loads them as an
 ordinary batch in the Assets target, where they are previewed and executed by the same code
 every other rename goes through — so there is no second execution path, and nothing is written
 until you have seen it.
@@ -192,7 +195,9 @@ renamed, not how many are selected.
 
 ## Automating
 
-Everything the panel does, a build machine can do. Renaming runs headless, reporting what it
+Everything the panel does to assets, a build machine can do: renaming, organizing, auditing and
+project health. Renaming level actors is the one exception, because a label lives in a level
+rather than in the asset registry. Renaming runs headless, reporting what it
 would do and changing nothing unless `-execute` is passed:
 
 ```
@@ -287,7 +292,8 @@ marked rather than passing quietly.
 
 ## Auditing
 
-Four whole-project reports, all read-only:
+Four of the five whole-project reports, all read-only. The fifth, `-organization`, is under
+[Organizing](#organizing):
 
 ```
 UnrealEditor-Cmd.exe <project> -run=NamesteadAudit -naming -unused -empty -duplicates
@@ -350,7 +356,7 @@ UnrealEditor-Cmd.exe <project> -run=NamesteadRename -path=/Game -organize -execu
 ```
 
 A move *is* a rename with a different package path, so it goes through the same validation,
-collision checking, referencing count, source control prompt, run report and history CSV as any
+collision checking, referencing count, run report and history CSV as any
 other rename. Which also means the same limit: **a move cannot be undone with Ctrl+Z**, and the
 CSV is the record of what happened.
 
@@ -388,6 +394,14 @@ A rule does not have to live in this plugin. `UNamesteadRenameRule` is exported 
 `Public/`, so a studio can keep its own rules in its own editor module:
 
 ```cpp
+// MyStudioRule.h
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Rules/NamesteadRenameRule.h"
+
+#include "MyStudioRule.generated.h"
+
 UCLASS(DisplayName = "Studio Department Prefix")
 class UMyStudioRule : public UNamesteadRenameRule
 {
@@ -404,8 +418,9 @@ public:
 };
 ```
 
-Add `"NamesteadEditor"` to your module's `PrivateDependencyModuleNames`, and `Namestead` to
-your `.uplugin` dependencies. **There is no registration call.** The add-rule dropdown is the
+The generated header must be the last include, and must match the file name. Add
+`"NamesteadEditor"` to your module's `PrivateDependencyModuleNames`, and `Namestead` to your
+`.uplugin` dependencies. **There is no registration call.** The add-rule dropdown is the
 engine's own class picker filtered by the base class, so a rule appears as soon as its module
 is loaded, and the pipeline calls a virtual without ever asking what type a rule is.
 
@@ -449,12 +464,46 @@ six materials in the test project rewrote six material instances that referenced
 Namestead counts those before acting and reports the number, because it is the part of a bulk
 rename that is easiest to be surprised by.
 
+### What is never renamed
+
+Some things are dropped before the batch is even built, so they leave no row in the table. The
+log lists how many, at Verbose.
+
+**World Partition and One File Per Actor maps.** A level of this kind keeps its actors in
+generated packages under a folder named after the map, and nothing in the engine moves that
+folder when the map is renamed. `AssetRenameManager` deliberately brings a level's build data
+along and says so in its own comment, but has no equivalent for external actors — so the
+renamed map looks for a folder still sitting under the old name and opens with none of its
+actors in it. The rename reports success, and there is no undo. Every UE5 template map is World
+Partition, so this is the first thing a stock project runs into. Unreal's own
+`WorldPartitionRenameDuplicateBuilder` is the tool that moves a world *with* its external
+packages; use that instead.
+
+**The generated packages themselves**, under `__ExternalActors__` and `__ExternalObjects__`.
+Their names are derived from the actor they belong to, so renaming one breaks the link.
+
+**Engine, script and temp content** — `/Engine`, `/Script` and `/Temp` are not the project's to
+modify. Plugin content is not restricted; it is yours.
+
+**Redirectors.** A redirector is a stub left by an earlier rename, so renaming one moves the
+signpost rather than the asset. A name held only by a redirector counts as free, though, so
+renaming *onto* it is allowed.
+
+Two more are refused later, in validation, and those do get a row explaining themselves: a
+change that differs only in letter case, and a name another asset in the same batch is itself
+moving out of.
+
 ## When something looks wrong
 
 **The panel is empty when I open it.** It reads the Content Browser selection at the moment it
 opens, and deliberately does not count the folder you happen to be browsing — that would turn
 opening the tab into a request for the whole of `/Game`. Select something and press **Use
 Content Browser Selection**.
+
+Or everything you picked is something Namestead does not rename — a redirector, engine content,
+a generated World Partition package, or a map whose actors live outside it. Those are dropped
+before the table is built, so they leave no row at all. See
+[What is never renamed](#what-is-never-renamed).
 
 **The button says Rename 0.** Either nothing is loaded and no rule has been added — the line
 above the button says which — or every proposed name is identical to the current one or was
@@ -487,15 +536,15 @@ project that has opted into no checks has not passed them.
 
 **"Set These Rules as the Convention" is greyed out.** Either the rule list is empty, since an
 empty convention would pass every asset and look exactly like a project that complies, or you
-are in Project Health, where the rules are behind the summary and you cannot see what you would
-be adopting. The line above the entry says which.
+are in Project Health or Organize, where a report is sitting where the rules were and you cannot
+see what you would be adopting. The line above the entry says which.
 
 **Naming reports almost every asset in the project.** Something in the convention proposes a
 name almost nothing already has. Two usual causes. A custom rule that reads `Context.Index`
 without overriding `IsPositionDependent` is evaluated at index 0 for every asset and proposes
 the same name for all of them. Or a rule that *is* correctly position-dependent is dropped from
 validation, and what the remaining rules then produce no longer matches the names your assets
-carry — a counter placed *before* a prefix rule does this. Check what the Expected column
+carry — a counter placed *before* a prefix rule does this. Check what the New Name column
 actually says; it is the name the convention wants, and it usually makes the cause obvious.
 
 When a convention contains position-dependent rules at all, the Naming row is marked **partly

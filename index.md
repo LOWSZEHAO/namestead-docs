@@ -40,10 +40,10 @@ only route. [Installation](#installation) has the rest, including building from 
 
 Then, in about two minutes:
 
-1. **Open it.** **Tools > Namestead** loads what is selected in the Content Browser.
-   Right-clicking a selection and picking **Open in Namestead** loads that *and* everything in
-   the folder you are browsing, which is usually what you want from a right-click and is worth
-   knowing before you press Rename.
+1. **Open it.** **Tools > Namestead** loads what is selected in the Content Browser, and so
+   does right-clicking a selection and picking **Open in Namestead**. Select nothing and it
+   takes the folder you are in instead, which is the only time a folder is consulted: an
+   explicit selection is the batch, and never has anything added to it.
 2. **Load a starting point.** **Load Preset > Unreal Standard** gives each asset the prefix for
    its class — `SM_`, `BP_`, `MI_` and so on, eighteen classes in all. Anything else is left
    alone rather than guessed at, so a batch of ordinary assets comes back Unchanged. Maps are a

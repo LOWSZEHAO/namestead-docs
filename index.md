@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 Keep a project clean, consistent and manageable as it grows.
 
 Large projects drift. Names stop matching whatever convention they started with, assets end up
@@ -15,6 +19,14 @@ Unreal already ships a batch renamer. This is not one of those.
 | **Audit** | Whole-project reports: names, unreferenced assets, empty folders, duplicate imports |
 | **Organize** | A folder plan that says where each class of asset belongs, previewed and applied like a rename |
 | **Automate** | All of it headless, with CSV reports and exit codes a build step can act on |
+
+## Contents
+{:.no_toc}
+
+<div class="toc" markdown="1">
+* TOC
+{:toc}
+</div>
 
 ## Getting started
 

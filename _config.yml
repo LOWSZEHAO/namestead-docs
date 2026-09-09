@@ -1,3 +1,12 @@
 title: Namestead
 description: Asset workflow and quality toolkit for the Unreal Engine editor
-theme: jekyll-theme-cayman
+url: https://lowszehao.github.io
+baseurl: /namestead-docs
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  toc_levels: 2..3
+
+exclude:
+  - README.md

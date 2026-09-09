@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ site.title }} — {{ site.description }}</title>
+<meta name="description" content="{{ site.description }}">
+<meta property="og:title" content="{{ site.title }}">
+<meta property="og:description" content="{{ site.description }}">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="nav-name" href="{{ '/' | relative_url }}">Namestead</a>
+    <div class="nav-links">
+      <a href="#getting-started">Getting started</a>
+      <a href="#rules">Rules</a>
+      <a href="#automating">Automating</a>
+      <a href="#installation">Install</a>
+      <a href="#support">Support</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <h1>Namestead</h1>
+  <p class="tagline">Asset workflow and quality toolkit for the Unreal Engine editor.</p>
+  <div class="meta">
+    <span>Unreal Engine 5.6 – 5.8</span>
+    <span>Windows editor</span>
+    <span>C++ source included</span>
+  </div>
+</header>
+
+<main class="panel">
+  {{ content }}
+</main>
+
+<footer class="foot">
+  <p>Copyright &copy; 2026 Low Sze Hao. All rights reserved.<br>
+  <a href="https://github.com/LOWSZEHAO">github.com/LOWSZEHAO</a></p>
+</footer>
+
+<script>
+// The nav sits flush on the ground until something scrolls under it, then earns its hairline.
+(function () {
+  var nav = document.getElementById('nav');
+  var onScroll = function () { nav.classList.toggle('scrolled', window.scrollY > 8); };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+</body>
+</html>

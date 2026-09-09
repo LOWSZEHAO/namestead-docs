@@ -23,6 +23,7 @@ Unreal already ships a batch renamer. This is not one of those.
 ![The Namestead panel previewing a rename](assets/img/panel-preview.png)
 
 *Seven assets, one rule. Two already comply and say so; the button counts only what will change.*
+{:.caption}
 
 ## Contents
 {:.no_toc}
@@ -201,6 +202,7 @@ renamed, not how many are selected.
 
 *Three assets selected, one already correct. The button reads Rename 2, and the line above it
 counts two more assets that will be resaved because they point at these.*
+{:.caption}
 
 ## Automating
 
@@ -257,6 +259,7 @@ UnrealEditor-Cmd.exe <project> -run=NamesteadRename -path=/Game -convention -exe
 
 *The same reports on a build machine. `-strict` turns a finding into exit code 1, which is what
 lets a build step act on it.*
+{:.caption}
 
 ## Project health
 
@@ -266,6 +269,7 @@ One pass over a project, reported as a summary rather than five lists:
 
 *Five categories over a small demo project, and the buttons that turn what they found back into
 a rename batch.*
+{:.caption}
 
 ```
 UnrealEditor-Cmd.exe <project> -run=NamesteadAudit -health
@@ -562,6 +566,7 @@ then to the one you want.
 ![Three renames refused because they differ only in case](assets/img/panel-refusal.png)
 
 *A rename that changes only capitalisation is refused in its own row, and the button drops to zero.*
+{:.caption}
 
 **A preset has fewer rules than when it was saved.** One of its rules comes from a module that
 is not present on this machine, so it deserialised as an empty entry. Namestead logs how many

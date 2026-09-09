@@ -367,13 +367,14 @@ body::before {
 }
 
 /* A caption belongs to the image above it, so it sits closer to that than to the next
-   paragraph and is quieter than body text. */
-.panel img + em,
-.panel p > em:only-child {
-  display: block;
+   paragraph and is quieter than body text. Tagged in the markdown rather than matched
+   structurally, because a paragraph whose only element is an <em> is not always a caption. */
+.panel p.caption {
   margin-top: 10px;
   font-size: 13.5px;
-  font-style: normal;
   color: var(--text-3);
   text-align: center;
 }
+
+/* The markdown writes the caption in italics; the emphasis is what marks it, not how it reads. */
+.panel p.caption em { font-style: normal; }

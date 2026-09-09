@@ -351,3 +351,29 @@ body::before {
   html { scroll-behavior: auto; }
   * { transition: none !important; animation: none !important; }
 }
+
+/* ── Screenshots.
+   Full bleed to the panel's padding rather than inset, because a UI screenshot is only useful
+   at the largest size the column allows. The hairline and radius stop a dark image from
+   reading as a hole punched in the page. ── */
+
+.panel img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 26px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-thumb);
+}
+
+/* A caption belongs to the image above it, so it sits closer to that than to the next
+   paragraph and is quieter than body text. */
+.panel img + em,
+.panel p > em:only-child {
+  display: block;
+  margin-top: 10px;
+  font-size: 13.5px;
+  font-style: normal;
+  color: var(--text-3);
+  text-align: center;
+}

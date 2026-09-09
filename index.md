@@ -20,6 +20,10 @@ Unreal already ships a batch renamer. This is not one of those.
 | **Organize** | A folder plan that says where each class of asset belongs, previewed and applied like a rename |
 | **Automate** | All of it headless, with CSV reports and exit codes a build step can act on |
 
+![The Namestead panel previewing a rename](assets/img/panel-preview.png)
+
+*Seven assets, one rule. Two already comply and say so; the button counts only what will change.*
+
 ## Contents
 {:.no_toc}
 
@@ -193,6 +197,11 @@ Content Browser selection, or everything inside a selected folder, and shows wha
 would become before anything is written. The button reports how many assets will actually be
 renamed, not how many are selected.
 
+![Three assets selected, two of them renameable](assets/img/panel-impact.png)
+
+*Three assets selected, one already correct. The button reads Rename 2, and the line above it
+counts two more assets that will be resaved because they point at these.*
+
 ## Automating
 
 Everything the panel does to assets, a build machine can do: renaming, organizing, auditing and
@@ -244,9 +253,19 @@ UnrealEditor-Cmd.exe <project> -run=NamesteadAudit -naming -strict
 UnrealEditor-Cmd.exe <project> -run=NamesteadRename -path=/Game -convention -execute
 ```
 
+![The audit commandlet running headless and exiting non-zero](assets/img/commandlet.png)
+
+*The same reports on a build machine. `-strict` turns a finding into exit code 1, which is what
+lets a build step act on it.*
+
 ## Project health
 
 One pass over a project, reported as a summary rather than five lists:
+
+![The Project Health report](assets/img/project-health.png)
+
+*Five categories over a small demo project, and the buttons that turn what they found back into
+a rename batch.*
 
 ```
 UnrealEditor-Cmd.exe <project> -run=NamesteadAudit -health
@@ -539,6 +558,10 @@ on every platform. The engine renames the package in memory, then cannot write t
 beside the old one on a case-insensitive filesystem, and the asset is left on disk under neither
 name — that was measured against a real asset, which did not come back. Rename to a third name,
 then to the one you want.
+
+![Three renames refused because they differ only in case](assets/img/panel-refusal.png)
+
+*A rename that changes only capitalisation is refused in its own row, and the button drops to zero.*
 
 **A preset has fewer rules than when it was saved.** One of its rules comes from a module that
 is not present on this machine, so it deserialised as an empty entry. Namestead logs how many

@@ -100,7 +100,7 @@ body {
   z-index: 20;
   background: rgba(245,245,247,0.62);
   backdrop-filter: saturate(190%) blur(22px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(190%) blur(22px);
   border-bottom: 1px solid transparent;
   transition: border-color .3s var(--ease-out-quart), box-shadow .3s var(--ease-out-quart);
 }

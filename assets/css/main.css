@@ -35,10 +35,16 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: smooth; scroll-padding-top: 76px; }
-
-body {
+html {
   background: var(--bg);
+  scroll-behavior: smooth;
+  scroll-padding-top: 76px;
+}
+
+/* Transparent on purpose. A negative z-index pseudo-element paints behind its own element's
+   background, so an opaque body would hide the grid below entirely. */
+body {
+  background: transparent;
   color: var(--text);
   font-family: var(--font);
   font-optical-sizing: auto;
